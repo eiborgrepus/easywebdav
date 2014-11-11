@@ -33,6 +33,14 @@ def prop(elem, name, default=None):
     child = elem.find('.//{DAV:}' + name)
     return default if child is None else child.text
 
+def getrealcontenttype(elem):
+    resource_type = elem.find('.//{DAV:}resourcetype')
+    if resource_type is not None:
+        coll = resource_type.find('.//{DAV:}collection')
+        if coll is not None:
+            return "httpd/unix-directory"
+    return prop(elem, 'getcontenttype', '')
+
 
 def elem2file(elem):
     return File(
@@ -40,7 +48,7 @@ def elem2file(elem):
         int(prop(elem, 'getcontentlength', 0)),
         prop(elem, 'getlastmodified', ''),
         prop(elem, 'creationdate', ''),
-        prop(elem, 'getcontenttype', ''),
+        getrealcontenttype(elem),
     )
 
 
